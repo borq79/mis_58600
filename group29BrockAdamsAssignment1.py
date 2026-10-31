@@ -3,7 +3,17 @@
 # Group 29 - Ryan Brock and Thomas Adams
 # Lab 1 - A Basic Engineering and Business Calculator
 ###############################################################################
-
+###############################################################################
+# Thomas
+# 1. Engineering Calculator - menus and subsequent calculators
+# 2. Business Calculator - menus and subsequent calculators
+#
+# Ryan
+# 1. Main
+# 2. Basic Calculator
+# 3. Error Corrections
+# 
+###############################################################################
 ## TODOS ##
 # 1. Catch divide by zero errors
 # 2. Improve error messages per the rubric
