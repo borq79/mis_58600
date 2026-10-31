@@ -3,7 +3,17 @@
 # Group 29 - Ryan Brock and Thomas Adams
 # Lab 1 - A Basic Engineering and Business Calculator
 ###############################################################################
-
+###############################################################################
+# Thomas
+# 1. Engineering Calculator - menus and subsequent calculators
+# 2. Business Calculator - menus and subsequent calculators
+#
+# Ryan
+# 1. Main
+# 2. Basic Calculator
+# 3. Error Corrections
+# 
+###############################################################################
 ## TODOS ##
 # 1. Catch divide by zero errors
 # 2. Improve error messages per the rubric
@@ -17,10 +27,10 @@
 # - The basic calculator doesn't take decimals
 
 # Thomas
-# - A negative radius is accepted
-# - Break-even crashes when price = variable cost
-# - Break-even can give negative units
-# - The area menu's error message says "1 or 2"
+# - A negative radius is accepted - fixed with read_float_input
+# - Break-even crashes when price = variable cost - fixed while, if, else in break_even_point
+# - Break-even can give negative units - fixed with read_float_input
+# - The area menu's error message says "1 or 2" - fixed corrected typo "1, 2, or 3"
 
 import math
 
@@ -54,12 +64,15 @@ def break_even_point():
 
     fixed_costs    = read_float_input("  Please enter the Fixed Costs = $ ")
     sales_price    = read_float_input("  Please enter the per unit Sales Price = $ ")
-    variable_costs = read_float_input("  Please enter the Variable Costs. = $ ")
-
-    
+    while True:
+        variable_costs = read_float_input("  Please enter the Variable Costs. = $ ")
+        if variable_costs < sales_price:
+            break
+        else:
+            print("Your Variable Costs cannot equal nor exceed your Sales Price. Please try again.")
     # try:
-        break_even_units = round(fixed_costs / (sales_price - variable_costs), 2)
-        print(f"  The break even point = {break_even_units} units.")
+    break_even_units = round(fixed_costs / (sales_price - variable_costs), 2)
+    print(f"  The break even point = {break_even_units} units.")
     # except ZeroDivisionError:
     #     print("  ERROR: The variable costs and sales price are the same, which resulted in a divide by zero, please try again")
 
@@ -247,7 +260,7 @@ def volume_calculator():
     elif user_choice == 3:
         cone_volume()
     else:
-        raise ValueError("  ERROR: Your choice must be 1 or 2, please try again. ")
+        raise ValueError("  ERROR: Your choice must be 1, 2, or 3. Please try again. ")
 
 ##############################################################################
 # Desc: This will execute Area Menu
@@ -277,7 +290,7 @@ def area_calculator():
     elif user_choice == 3:
         circle_area()
     else:
-        raise ValueError("  ERROR: Your choice must be 1 or 2, please try again. ")
+        raise ValueError("  ERROR: Your choice must be 1, 2, or 3. Please try again. ")
 
 ##############################################################################
 # Desc: This is the menu for Geometric Calculators (Area or Volume)
