@@ -61,8 +61,8 @@ def break_even_point():
         else:
             print("Your Variable Costs cannot equal nor exceed your Sales Price. Please try again.")
     # try:
-        break_even_units = round(fixed_costs / (sales_price - variable_costs), 2)
-        print(f"  The break even point = {break_even_units} units.")
+    break_even_units = round(fixed_costs / (sales_price - variable_costs), 2)
+    print(f"  The break even point = {break_even_units} units.")
     # except ZeroDivisionError:
     #     print("  ERROR: The variable costs and sales price are the same, which resulted in a divide by zero, please try again")
 
