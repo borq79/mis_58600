@@ -92,12 +92,7 @@ def kilograms_to_pounds():
     print("  ##")
     print("  ## Convert Kilograms to Pounds \n")
 
-    while True:
-        try:
-            kilos = read_float_input("  Please enter the mass in kilograms. m = ")
-            break
-        except ValueError:
-            print("\n  ERROR: Please enter numbers only. Try again. \n")
+    kilos = read_float_input("  Please enter the mass in kilograms. m = ")
 
     pounds = round(kilos * 2.20462, 2)
     
