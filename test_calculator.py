@@ -175,12 +175,21 @@ class TestArea(unittest.TestCase):
         self.assertIn("error", output.lower())
         self.assertIn("= 12.57", output)
 
-    # ---- Known bugs (remove the decorator once fixed) ----
-
-    @unittest.expectedFailure
     def test_negative_radius_rejected(self):
-        output = run_until_out_of_inputs(calc.circle_area, ["-2"])
-        self.assertNotIn("12.57", output)
+        # -2 is rejected, then 2 is accepted
+        output = run_function(calc.circle_area, ["-2", "2"])
+        self.assertIn("error", output.lower())
+        self.assertIn("pi * 2.0^2", output)
+
+    def test_negative_rectangle_side_rejected(self):
+        output = run_function(calc.rectangle_area, ["-3", "3", "4"])
+        self.assertIn("error", output.lower())
+        self.assertIn("= 12.0", output)
+
+    def test_negative_triangle_height_rejected(self):
+        output = run_function(calc.triangle_area, ["4", "-5", "5"])
+        self.assertIn("error", output.lower())
+        self.assertIn("= 10.0", output)
 
 
 ###############################################################################
@@ -199,6 +208,37 @@ class TestVolume(unittest.TestCase):
     def test_cone_volume(self):
         output = run_function(calc.cone_volume, ["2", "3"])
         self.assertIn("= 12.57", output)
+
+    def test_negative_cube_side_rejected(self):
+        output = run_function(calc.cube_volume, ["-3", "3"])
+        self.assertIn("error", output.lower())
+        self.assertIn("= 27.0", output)
+
+    def test_negative_cylinder_radius_rejected(self):
+        output = run_function(calc.cylinder_volume, ["-2", "2", "3"])
+        self.assertIn("error", output.lower())
+        self.assertIn("= 37.7", output)
+
+    def test_negative_cone_height_rejected(self):
+        output = run_function(calc.cone_volume, ["2", "-3", "3"])
+        self.assertIn("error", output.lower())
+        self.assertIn("= 12.57", output)
+
+
+###############################################################################
+# Engineering Calculations - Unit Conversions (negative input)
+###############################################################################
+class TestUnitConversionsNegative(unittest.TestCase):
+
+    def test_negative_meters_rejected(self):
+        output = run_function(calc.meters_to_feet, ["-10", "10"])
+        self.assertIn("error", output.lower())
+        self.assertIn("32.81", output)
+
+    def test_negative_kilograms_rejected(self):
+        output = run_function(calc.kilograms_to_pounds, ["-10", "10"])
+        self.assertIn("error", output.lower())
+        self.assertIn("22.05", output)
 
 
 ###############################################################################

@@ -11,9 +11,12 @@
 # 4. Check the inputs right after and don't allow them to enter both and then check
 # 
 # The 7 bugs still open:
+# Ryan
 # - Dividing by zero crashes
 # - Mod by zero crashes
 # - The basic calculator doesn't take decimals
+
+# Thomas
 # - A negative radius is accepted
 # - Break-even crashes when price = variable cost
 # - Break-even can give negative units
@@ -21,6 +24,13 @@
 
 import math
 
+
+##############################################################################
+# Desc: This function will handle the float inputs and handle the exceptions
+#       for the user.
+# Parameters: The message to display to the user to accept input
+# Returns: The user's input
+##############################################################################
 def read_float_input(message_to_user):
     while True:
         try:
@@ -103,12 +113,7 @@ def meters_to_feet():
     print("  ##")
     print("  ## Convert Meter to Feet \n")
 
-    while True:
-        try:
-            meters = read_float_input("  Please enter the length in meters. l = ")
-            break
-        except ValueError:
-            print("\n ERROR: Please enter numbers only. Try again. \n")
+    meters = read_float_input("  Please enter the length in meters. l = ")
 
     feet = round(meters * 3.28084, 2)
     
@@ -124,13 +129,7 @@ def circle_area():
     print("  ##")
     print("  ## Calculate the area of a Circle \n")
 
-    while True:
-        try:
-            radius = float(input("  ## Please enter the radius of the circle. r = "))
-            break
-        except ValueError:
-            print("\n  ERROR: Please enter numbers only. Try again. \n")
-
+    radius = read_float_input("  ## Please enter the radius of the circle. r = ")
     area_circle = round(math.pi * radius ** 2, 2)
     
     print(f"  The area of your circle is pi * {radius}^2  = {area_circle}\n\n")
@@ -147,13 +146,9 @@ def rectangle_area():
     print("  ##")
     print("  ## Calculate the area of a Rectangle \n")
 
-    while True:
-        try:
-            length = float(input("  ## Please enter the length of the rectangle. l = "))
-            width = float(input("  ## Please enter the width of the rectangle. w = "))
-            break
-        except ValueError:
-            print("\n  ERROR: Please enter numbers only. Try again. \n")
+
+    length = read_float_input("  ## Please enter the length of the rectangle. l = ")
+    width  = read_float_input("  ## Please enter the width of the rectangle. w = ")
 
     area_rectangle = round(length * width, 2)
     
@@ -169,13 +164,8 @@ def triangle_area():
     print("  ##")
     print("  ## Calculate the area of a Triangle \n")
 
-    while True:
-        try:
-            base = float(input("  ## Please enter the base of the triangle. b = "))
-            height = float(input("  ## Please enter the altitude height of the triangle. h = "))
-            break
-        except ValueError:
-            print("\n  ERROR: Please enter numbers only. Try again. \n")
+    base   = read_float_input("  ## Please enter the base of the triangle. b = ")
+    height = read_float_input("  ## Please enter the altitude height of the triangle. h = ")
 
     area_triangle = round((base * height)/2, 2)
     
@@ -191,13 +181,8 @@ def cylinder_volume():
     print("  ##")
     print("  ## Calculate the volume of a Cylinder \n")
 
-    while True:
-        try:
-            radius_cylinder = float(input("  ## Please enter the radius of the cylinder. r = "))
-            height_cylinder = float(input("  ## Please enter the altitude height of the cylinder. h = "))
-            break
-        except ValueError:
-            print("\n  ERROR: Please enter numbers only. Try again. \n")
+    radius_cylinder = read_float_input("  ## Please enter the radius of the cylinder. r = ")
+    height_cylinder = read_float_input("  ## Please enter the altitude height of the cylinder. h = ")
 
     volume_cylinder = round(math.pi * radius_cylinder ** 2 * height_cylinder, 2)
     
@@ -215,13 +200,8 @@ def cone_volume():
     print("  ##")
     print("  ## Calculate the volume of a Cone \n")
 
-    while True:
-        try:
-            radius_cone = float(input("  ## Please enter the radius of the cone. r = "))
-            height_cone = float(input("  ## Please enter the altitude height of the cone. h = "))
-            break
-        except ValueError:
-            print("\n  ERROR: Please enter numbers only. Try again. \n")
+    radius_cone = read_float_input("  ## Please enter the radius of the cone. r = ")
+    height_cone = read_float_input("  ## Please enter the altitude height of the cone. h = ")
 
     volume_cone = round((math.pi * radius_cone ** 2 * height_cone)/3, 2)
     
@@ -237,12 +217,7 @@ def cube_volume():
     print("  ##")
     print("  ## Calculate the volume of a Cube \n")
 
-    while True:
-        try:
-            side_length = float(input("  ## Please enter the side legnth of the cube. s = "))
-            break
-        except ValueError:
-            print("\n  ERROR: Please enter numbers only. Try again. \n")
+    side_length = read_float_input("  ## Please enter the side legnth of the cube. s = ")
 
     volume_cube = round(side_length ** 3, 2)
     
