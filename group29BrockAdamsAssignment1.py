@@ -17,10 +17,10 @@
 # - The basic calculator doesn't take decimals
 
 # Thomas
-# - A negative radius is accepted
-# - Break-even crashes when price = variable cost
-# - Break-even can give negative units
-# - The area menu's error message says "1 or 2"
+# - A negative radius is accepted - fixed with read_float_input
+# - Break-even crashes when price = variable cost - fixed while, if, else in break_even_point
+# - Break-even can give negative units - fixed with read_float_input
+# - The area menu's error message says "1 or 2" - fixed corrected typo "1, 2, or 3"
 
 import math
 
@@ -250,7 +250,7 @@ def volume_calculator():
     elif user_choice == 3:
         cone_volume()
     else:
-        raise ValueError("  ERROR: Your choice must be 1 or 2, please try again. ")
+        raise ValueError("  ERROR: Your choice must be 1, 2, or 3. Please try again. ")
 
 ##############################################################################
 # Desc: This will execute Area Menu
@@ -280,7 +280,7 @@ def area_calculator():
     elif user_choice == 3:
         circle_area()
     else:
-        raise ValueError("  ERROR: Your choice must be 1 or 2, please try again. ")
+        raise ValueError("  ERROR: Your choice must be 1, 2, or 3. Please try again. ")
 
 ##############################################################################
 # Desc: This is the menu for Geometric Calculators (Area or Volume)
