@@ -57,7 +57,7 @@ def read_float_input_gte_zero(message_to_user):
     while True:
         user_value = read_float_input_all_real_numbers(message_to_user)
         if user_value < 0:
-            print ("\n  ERROR: Values must be greater than or equal to 0. Please try again")
+            print ("\n  ERROR: Values must be greater than or equal to 0. Please try again\n")
         else:
             return user_value
 
@@ -73,7 +73,7 @@ def read_menu_choice(message_to_user, max_menu_choice):
         try:
             user_choice = int(input(message_to_user))
             if user_choice < 1 or user_choice > max_menu_choice:
-                print(f"\n  ERROR: Your choice must be between 1 and {max_menu_choice}. Please try again. ")
+                print(f"\n  ERROR: Your choice must be between 1 and {max_menu_choice}. Please try again.\n")
                 continue
             return user_choice
         except ValueError:
@@ -101,12 +101,12 @@ def break_even_point():
         if variable_costs < sales_price:
             break
         else:
-            print("\n  ERROR: Your Variable Costs cannot equal or exceed your Sales Price. Please try again.")
+            print("\n  ERROR: Your Variable Costs cannot equal or exceed your Sales Price. Please try again.\n")
 
     # The above handlers allow 0 for the variable costs, which is valid. It does ensure that there are no
     # divide by zero scenarios, so sales_price - variable_costs cannot equal zero. 
     break_even_units = round(fixed_costs / (sales_price - variable_costs), 2)
-    print(f"\n  The break even point = {break_even_units} units.")
+    print(f"\n  The break even point = {break_even_units} units.\n")
 
 
 ##############################################################################
@@ -125,7 +125,7 @@ def compound_interest():
     
     compounded = round((principal * (1 + (annual_interest/100))**number_periods) - principal, 2)
     balance = compounded + principal
-    print(f"\n  The compounded interest of ${principal:.2f} at {annual_interest}% for {number_periods} periods. = ${compounded:.2f}, which brings your balance to ${balance:.2f}.")
+    print(f"\n  The compounded interest of ${principal:.2f} at {annual_interest}% for {number_periods} periods. = ${compounded:.2f}, which brings your balance to ${balance:.2f}.\n")
 
 ##############################################################################
 # Desc: This function will convert kilograms to pounds
@@ -431,7 +431,7 @@ def basic_calculator_operations():
     
         print(f"\n  Result of Calculation {left_value} {user_operation} {right_value} = {result}\n\n")
     except ZeroDivisionError:
-        print("\n  ERROR: Your input values resulted in a divide by zero scenario, please try again")
+        print("\n  ERROR: Your input values resulted in a divide by zero scenario, please try again\n")
 
 ##############################################################################
 # Desc: This function renders the user menu
@@ -456,7 +456,7 @@ def show_main_menu():
 # Returns: Void
 ##############################################################################
 def execute_user_option(user_choice):
-    print("\n  You've chosen option " + str(user_choice))
+    print("\n  You've chosen option " + str(user_choice) + "\n")
 
     if user_choice == 1:
         basic_calculator_operations()
