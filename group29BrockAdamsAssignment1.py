@@ -54,9 +54,12 @@ def break_even_point():
 
     fixed_costs    = read_float_input("  Please enter the Fixed Costs = $ ")
     sales_price    = read_float_input("  Please enter the per unit Sales Price = $ ")
-    variable_costs = read_float_input("  Please enter the Variable Costs. = $ ")
-
-    
+    while True:
+        variable_costs = read_float_input("  Please enter the Variable Costs. = $ ")
+        if variable_costs < sales_price:
+            break
+        else:
+            print("Your Variable Costs cannot equal nor exceed your Sales Price. Please try again.")
     # try:
         break_even_units = round(fixed_costs / (sales_price - variable_costs), 2)
         print(f"  The break even point = {break_even_units} units.")
