@@ -116,8 +116,23 @@ class TestBasicCalculator(unittest.TestCase):
         self.assertIn("= 3", output)
 
     def test_invalid_operation_reports_error(self):
-        with self.assertRaises(ValueError):
-            run_function(calc.basic_calculator_operations, ["foo", "1", "2"])
+        # Passes whether the error is raised to the main menu or the
+        # operation is re-asked
+        try:
+            output = run_until_out_of_inputs(calc.basic_calculator_operations,
+                                             ["foo", "1", "2"])
+        except ValueError as error:
+            output = str(error)
+        self.assertIn("error", output.lower())
+        self.assertNotIn("Result", output)
+
+    def test_decimal_input_accepted(self):
+        output = run_function(calc.basic_calculator_operations, ["+", "2.5", "1"])
+        self.assertIn("= 3.5", output)
+
+    def test_negative_numbers_accepted(self):
+        output = run_function(calc.basic_calculator_operations, ["-", "5", "-3"])
+        self.assertIn("= 8", output)
 
     def test_divide_by_zero_does_not_crash(self):
         try:
@@ -144,13 +159,16 @@ class TestBasicCalculator(unittest.TestCase):
             self.fail("0 ^ -1 crashed the program")
         self.assertIn("error", output.lower())
 
-    # ---- Known bugs (remove the decorator once fixed) ----
-
-    @unittest.expectedFailure
-    def test_decimal_input_accepted(self):
-        output = run_until_out_of_inputs(calc.basic_calculator_operations,
-                                         ["+", "2.5", "1"])
-        self.assertIn("= 3.5", output)
+    def test_invalid_operation_checked_before_numbers(self):
+        # "foo" should be rejected right away and the operation re-asked,
+        # so "+" is the operation and 1 + 2 = 3
+        try:
+            output = run_until_out_of_inputs(calc.basic_calculator_operations,
+                                             ["foo", "+", "1", "2"])
+        except ValueError:
+            self.fail("Operation was only checked after the numbers were entered")
+        self.assertIn("error", output.lower())
+        self.assertIn("= 3", output)
 
 
 ###############################################################################
@@ -300,12 +318,19 @@ class TestBusiness(unittest.TestCase):
         self.assertIn("error", output.lower())
         self.assertNotIn("units.", output)
 
-    # ---- Known bugs (remove the decorator once fixed) ----
-
-    @unittest.expectedFailure
     def test_break_even_no_negative_units(self):
-        output = run_until_out_of_inputs(calc.break_even_point, ["1000", "5", "10"])
+        # Price 10 / cost 15 is rejected, both are re-asked, then 10 / 5 works
+        output = run_function(calc.break_even_point, ["1000", "10", "15", "10", "5"])
+        self.assertIn("error", output.lower())
         self.assertNotIn("= -", output)
+        self.assertIn("= 200.0 units", output)
+
+    def test_break_even_zero_sales_price_not_stuck(self):
+        # Price 0 / cost 0 is rejected, then price 5 / cost 2 can be entered:
+        # 1000 / (5 - 2) = 333.33 units
+        output = run_function(calc.break_even_point, ["1000", "0", "0", "5", "2"])
+        self.assertIn("error", output.lower())
+        self.assertIn("333.33", output)
 
 
 ###############################################################################
@@ -313,41 +338,54 @@ class TestBusiness(unittest.TestCase):
 ###############################################################################
 class TestMenus(unittest.TestCase):
 
-    def test_main_menu_returns_valid_choice(self):
+    def test_read_menu_choice_returns_valid_choice(self):
         choice = None
 
         def read_choice():
             nonlocal choice
-            choice = calc.read_user_menu_choice()
+            choice = calc.read_menu_choice("Pick: ", 4)
 
         run_function(read_choice, ["2"])
         self.assertEqual(choice, 2)
 
-    def test_main_menu_option_4_exits(self):
-        with self.assertRaises(SystemExit):
-            run_function(calc.read_user_menu_choice, ["4"])
-
-    def test_main_menu_out_of_range_rejected(self):
-        with self.assertRaises(ValueError):
-            run_function(calc.read_user_menu_choice, ["9"])
-
-    def test_main_menu_letters_reprompt(self):
+    def test_read_menu_choice_out_of_range_reprompts(self):
         choice = None
 
         def read_choice():
             nonlocal choice
-            choice = calc.read_user_menu_choice()
+            choice = calc.read_menu_choice("Pick: ", 4)
+
+        output = run_function(read_choice, ["9", "0", "3"])
+        self.assertIn("error", output.lower())
+        self.assertEqual(choice, 3)
+
+    def test_read_menu_choice_letters_reprompt(self):
+        choice = None
+
+        def read_choice():
+            nonlocal choice
+            choice = calc.read_menu_choice("Pick: ", 4)
 
         output = run_function(read_choice, ["x", "1"])
         self.assertIn("error", output.lower())
         self.assertEqual(choice, 1)
 
+    def test_main_option_4_exits(self):
+        # main() should return (not ask for more input) when 4 is chosen
+        output = run_function(calc.main, ["4"])
+        self.assertNotIn("You've chosen", output)
+
     def test_basic_path_through_main(self):
         # Menu 1 -> 2 + 3 -> exit
-        with self.assertRaises(SystemExit):
-            output = io.StringIO()
-            with redirect_stdout(output):
-                run_function(calc.main, ["1", "+", "2", "3", "4"])
+        output = run_function(calc.main, ["1", "+", "2", "3", "4"])
+        self.assertIn("= 5.0", output)
+
+    def test_main_returns_to_menu_after_calculation(self):
+        # Two calculations in a row, then exit: 2 + 3, then cube side 3
+        output = run_function(calc.main,
+                              ["1", "+", "2", "3", "2", "1", "2", "1", "3", "4"])
+        self.assertIn("= 5.0", output)
+        self.assertIn("= 27.0", output)
 
     def test_engineering_area_path(self):
         # Engineering -> Geometry -> Area -> Rectangle 3 x 4
@@ -368,24 +406,22 @@ class TestMenus(unittest.TestCase):
         output = run_function(calc.execute_user_option, ["2", "1000", "10", "5"], 3)
         self.assertIn("= 200.0 units", output)
 
-    def test_submenu_invalid_choice_reports_error(self):
-        with self.assertRaises(ValueError):
-            run_function(calc.business_calculations, ["7"])
+    def test_submenu_invalid_choice_reprompts(self):
+        # 7 is rejected and the business menu asks again (stays in the
+        # sub-menu instead of going back to the main menu)
+        output = run_function(calc.business_calculations, ["7", "2", "1000", "10", "5"])
+        self.assertIn("error", output.lower())
+        self.assertIn("= 200.0 units", output)
+
+    def test_area_menu_invalid_choice_mentions_option_3(self):
+        output = run_function(calc.area_calculator, ["7", "3", "2"])
+        self.assertIn("3", output.split("ERROR")[1].split("\n")[0])
+        self.assertIn("= 12.57", output)
 
     def test_main_recovers_from_bad_choice(self):
-        # Bad main-menu choice prints an error, menu shows again, then exit
-        output = io.StringIO()
-        with self.assertRaises(SystemExit):
-            with redirect_stdout(output):
-                run_function(calc.main, ["9", "4"])
-
-    # ---- Known bugs (remove the decorator once fixed) ----
-
-    @unittest.expectedFailure
-    def test_area_menu_error_mentions_option_3(self):
-        with self.assertRaises(ValueError) as error:
-            run_function(calc.area_calculator, ["7"])
-        self.assertIn("3", str(error.exception))
+        # Bad main-menu choice prints an error, then 4 exits
+        output = run_function(calc.main, ["9", "4"])
+        self.assertIn("error", output.lower())
 
 
 if __name__ == "__main__":
