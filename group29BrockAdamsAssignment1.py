@@ -87,8 +87,9 @@ def read_menu_choice(message_to_user, max_menu_choice):
 ##############################################################################
 # Break Even Calculator
 def break_even_point():
-    print("  ##")
-    print("  ## Calculate the Break Even Point \n")
+    print("\n  ##")
+    print("  ## Calculate the Break Even Point")
+    print("  ##\n")
 
     fixed_costs    = read_float_input_gte_zero("  ## Please enter the Fixed Costs = $ ")
 
@@ -116,10 +117,11 @@ def break_even_point():
 ##############################################################################
 # Compound Interest Calculator
 def compound_interest():
-    print("  ##")
-    print("  ## Calculate Compound Interest \n")
+    print("\n  ##")
+    print("  ## Calculate Compound Interest")
+    print("  ##\n")
 
-    principal       = read_float_input_gte_zero("  ## Please enter the initial principal. p =$ ")
+    principal       = read_float_input_gte_zero("  ## Please enter the initial principal. p = $")
     annual_interest = read_float_input_gte_zero("  ## Please enter the interest rate (if 5% enter 5). i = ")
     number_periods  = read_float_input_gte_zero("  ## Please enter the number of periods. n = ")
     
@@ -134,8 +136,9 @@ def compound_interest():
 ##############################################################################
 # Convert Kilograms to Pounds
 def kilograms_to_pounds():
-    print("  ##")
-    print("  ## Convert Kilograms to Pounds \n")
+    print("\n  ##")
+    print("  ## Convert Kilograms to Pounds")
+    print("  ##\n")
 
     kilos = read_float_input_gte_zero("  ## Please enter the mass in kilograms. m = ")
 
@@ -150,8 +153,9 @@ def kilograms_to_pounds():
 ##############################################################################
 # Convert Meters to Feet
 def meters_to_feet():
-    print("  ##")
-    print("  ## Convert Meters to Feet \n")
+    print("\n  ##")
+    print("  ## Convert Meters to Feet")
+    print("  ##\n")
 
     meters = read_float_input_gte_zero("  ## Please enter the length in meters. l = ")
 
@@ -166,8 +170,9 @@ def meters_to_feet():
 ##############################################################################
 # Area of a Circle
 def circle_area():
-    print("  ##")
-    print("  ## Calculate the area of a Circle \n")
+    print("\n  ##")
+    print("  ## Calculate the area of a Circle")
+    print("  ##\n")
 
     radius = read_float_input_gte_zero("  ## Please enter the radius of the circle. r = ")
     area_circle = round(math.pi * radius ** 2, 2)
@@ -183,8 +188,9 @@ def circle_area():
 ##############################################################################
 # Area of a Rectangle
 def rectangle_area():
-    print("  ##")
-    print("  ## Calculate the area of a Rectangle \n")
+    print("\n  ##")
+    print("  ## Calculate the area of a Rectangle")
+    print("  ##\n")
 
 
     length = read_float_input_gte_zero("  ## Please enter the length of the rectangle. l = ")
@@ -201,8 +207,9 @@ def rectangle_area():
 ##############################################################################
 # Area of a Triangle
 def triangle_area():
-    print("  ##")
-    print("  ## Calculate the area of a Triangle \n")
+    print("\n  ##")
+    print("  ## Calculate the area of a Triangle")
+    print("  ##\n")
 
     base   = read_float_input_gte_zero("  ## Please enter the base of the triangle. b = ")
     height = read_float_input_gte_zero("  ## Please enter the altitude height of the triangle. h = ")
@@ -218,8 +225,9 @@ def triangle_area():
 ##############################################################################
 # Volume of a Cylinder
 def cylinder_volume():
-    print("  ##")
-    print("  ## Calculate the volume of a Cylinder \n")
+    print("\n  ##")
+    print("  ## Calculate the volume of a Cylinder")
+    print("  ##\n")
 
     radius_cylinder = read_float_input_gte_zero("  ## Please enter the radius of the cylinder. r = ")
     height_cylinder = read_float_input_gte_zero("  ## Please enter the altitude height of the cylinder. h = ")
@@ -237,8 +245,9 @@ def cylinder_volume():
 ##############################################################################
 # Volume of a Cone
 def cone_volume():
-    print("  ##")
-    print("  ## Calculate the volume of a Cone \n")
+    print("\n  ##")
+    print("  ## Calculate the volume of a Cone")
+    print("  ##\n")
 
     radius_cone = read_float_input_gte_zero("  ## Please enter the radius of the cone. r = ")
     height_cone = read_float_input_gte_zero("  ## Please enter the altitude height of the cone. h = ")
@@ -254,8 +263,9 @@ def cone_volume():
 ##############################################################################
 # Volume of a Cube
 def cube_volume():
-    print("  ##")
-    print("  ## Calculate the volume of a Cube \n")
+    print("\n  ##")
+    print("  ## Calculate the volume of a Cube")
+    print("  ##\n")
 
     side_length = read_float_input_gte_zero("  ## Please enter the side length of the cube. s = ")
 
@@ -271,8 +281,9 @@ def cube_volume():
 ##############################################################################
 # Volume Calculations
 def volume_calculator():
-    print("  ##")
-    print("  ## Volume Calculator \n")
+    print("\n  ##")
+    print("  ## Volume Calculator")
+    print("  ##\n")
     print("  ## Please select one of the following Geometric Shapes: ")
     print("  ## 1. Cube")
     print("  ## 2. Cylinder")
@@ -294,8 +305,9 @@ def volume_calculator():
 ##############################################################################
 # Area Calculations
 def area_calculator():
-    print("  ##")
-    print("  ## Area Calculator \n")
+    print("\n  ##")
+    print("  ## Area Calculator")
+    print("  ##\n")
     print("  ## Please select one of the following Geometric Shapes: ")
     print("  ## 1. Triangle")
     print("  ## 2. Rectangle")
@@ -317,8 +329,9 @@ def area_calculator():
 ##############################################################################
 # Geometry Choices
 def geometry_choices():
-    print("  ##")
-    print("  ## Geometry Calculator \n")
+    print("\n  ##")
+    print("  ## Geometry Calculator")
+    print("  ##\n")
     print("  ## Please select one of the following Geometry Calculators: ")
     print("  ## 1. Area")
     print("  ## 2. Volume")
@@ -337,8 +350,9 @@ def geometry_choices():
 # Returns: Void
 ##############################################################################
 def unit_choices():
-    print("  ##")
-    print("  ## Unit Conversions Calculator \n")
+    print("\n  ##")
+    print("  ## Unit Conversions Calculator")
+    print("  ##\n")
     print("  ## Please select one of the following Unit Conversions: ")
     print("  ## 1. Convert Meters to Feet")
     print("  ## 2. Convert Kilograms to Pounds")
@@ -357,8 +371,9 @@ def unit_choices():
 # Returns: Void
 ##############################################################################
 def business_calculations():
-    print("  ##")
-    print("  ## Business Calculator \n")
+    print("\n  ##")
+    print("  ## Business Calculator")
+    print("  ##\n")
     print("  ## Please select one of the following Business Calculations: ")
     print("  ## 1. Calculate Compound Interest")
     print("  ## 2. Calculate Break Even Point")
@@ -380,8 +395,9 @@ def business_calculations():
 ##############################################################################
 def engineering_calculations():
 
-    print("  ##")
-    print("  ## Engineering Calculator \n")
+    print("\n  ##")
+    print("  ## Engineering Calculator")
+    print("  ##\n")
     print("  ## Please select one of the following operations: ")
     print("  ## 1. Geometry Calculator")
     print("  ## 2. Unit Conversions")
@@ -399,14 +415,15 @@ def engineering_calculations():
 # Returns: Void
 ##############################################################################
 def basic_calculator_operations():
-    print("  ##")
-    print("  ## Basic Mathematical Operations \n")
+    print("\n  ##")
+    print("  ## Basic Mathematical Operations")
+    print("  ##\n")
 
     while True:
         user_operation = input("  ## Choose which operation you'd like to use +, -, *, /, mod, or ^:  ")
 
-        # [Attention to the grader] This isn't in the material covered exactly, however this makes the code slightly cleaner and is
-        # easier to read and understand
+        # [Attention to the grader] This isn't in the material covered exactly, however this makes the 
+        # code slightly cleaner and is easier to read and understand
         if user_operation not in ["+", "-", "*", "/", "mod", "^"]:
             print("\n  ERROR: You must pick one of: +, -, *, /, mod, or ^. Try again.\n")
             continue
@@ -456,8 +473,6 @@ def show_main_menu():
 # Returns: Void
 ##############################################################################
 def execute_user_option(user_choice):
-    print("\n  You've chosen option " + str(user_choice) + "\n")
-
     if user_choice == 1:
         basic_calculator_operations()
     elif user_choice == 2:
