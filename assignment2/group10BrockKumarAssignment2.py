@@ -26,6 +26,9 @@
 #
 ###############################################################################
 # Initialize the product catalog
+
+from datetime import datetime
+
 product_catalog = {
     'P1':  {'Name': 'Product 1',  'Price': 10.99,  'Stock': 100},
     'P2':  {'Name': 'Product 2',  'Price': 5.99,   'Stock': 50},
@@ -87,6 +90,19 @@ def make_sale():
         except ValueError:
             print (f"The quanity must be an integer between 1 and the number of units in stock")
 
+    sale = {
+        'Sale ID': f'S{len(sales_history) + 1}',
+        'Date and Time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'Product ID': id_of_sale,
+        'Product Name': product_catalog[id_of_sale]['Name'],
+        'Quantity': quanity,
+        'Total Sale Amount': round(product_catalog[id_of_sale]['Price'] * quanity, 2)
+    }
+    product_catalog[id_of_sale]['Stock'] -= quanity
+    sales_history.append(sale)
+    print(f"Sale {sale['Sale ID']} completed. Total: ${sale['Total Sale Amount']:.2f}")
+    print(f"Remaining stock: {product_catalog[id_of_sale]['Stock']}")
+    print ("---------------------------------------------\n")
 
     # Sachin: your code to make the sale 
     
@@ -99,7 +115,11 @@ def make_sale():
 def view_sales_history():
     # Sachin: your code to view the sales history
     print("\nSales History:")
-
+    if not sales_history:
+        print("No sales history available.")
+    else:
+        for sale in sales_history:
+            print(f"Sale: {sale['Sale ID']}, Product: {sale['Product Name']}, Quantity: {sale['Quantity']}, Total: ${sale['Total Sale Amount']:.2f}, Date: {sale['Date and Time']}")
 
 ##############################################################################
 # Desc: This function display the KPIs such as revenue, best-selling products
@@ -109,6 +129,39 @@ def view_sales_history():
 ##############################################################################
 def display_kpis():
     # Sachin: your code to view kpis
+    total_revenue = sum(sale['Total Sale Amount'] for sale in sales_history)
+    print(f"\nTotal Sales Revenue: ${total_revenue:.2f}")
+    
+    if not sales_history:
+        print("No sales history available to determine best-selling products.")
+        return
+    
+    # Calculate best-selling products
+    product_sales = {}
+    for sale in sales_history:
+        product_name = sale['Product Name']
+        quantity = sale['Quantity']
+        if product_name in product_sales:
+            product_sales[product_name] += quantity
+        else:
+            product_sales[product_name] = quantity
+
+    best_selling_product = max(product_sales, key=product_sales.get)
+    print(f"Best-Selling Product: {best_selling_product} with {product_sales[best_selling_product]} units sold.")
+
+    # Find product with highest revenue
+    product_revenue = {}
+    for sale in sales_history:
+        product_name = sale['Product Name']
+        total_sale_amount = sale['Total Sale Amount']
+        if product_name in product_revenue:
+            product_revenue[product_name] += total_sale_amount
+        else:
+            product_revenue[product_name] = total_sale_amount
+
+    highest_revenue_product = max(product_revenue, key=product_revenue.get)
+    print(f"Product with Highest Revenue: {highest_revenue_product} with ${product_revenue[highest_revenue_product]:.2f} in revenue.")
+
     return
 
 
