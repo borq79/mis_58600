@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+import math
+from datetime import datetime
 
 ###############################################################################
 # MIS 58600
@@ -10,7 +11,7 @@
 ###############################################################################
 # Notes on collaboration
 #
-# Tasks done by Sachin: ()
+# Tasks done by Sachin:
 # 1. Implemented view_sales_history function
 # 2. Implemented display_kpis function
 # 3. Implemented make_sale logic and sale recording
@@ -26,15 +27,15 @@
 # a series of unit tests to validate the program. The unit tests allowed us to
 # refactor the code safely knowing we didn't break anything. They are available
 # upon request. 
-# Ryan: AI was not used in the creation of the code within this file,only the unit tests.
-# Sachin Kumar:  AI tool used : Auto suggestion/code complete built-in within VSS Code IDE.
+
+# Ryan: AI was not used in the creation of the code within this file,
+#       only the unit tests.
+# Sachin Kumar:  AI tool used : Auto suggestion/code complete 
+#                built-in within VS Code IDE.
 #
 ###############################################################################
+
 # Initialize the product catalog
-
-import math
-from datetime import datetime
-
 product_catalog = {
     'P1':  {'Name': 'Product 1',  'Price': 10.99,  'Stock': 100},
     'P2':  {'Name': 'Product 2',  'Price': 5.99,   'Stock': 50},
@@ -64,7 +65,7 @@ def view_catalog():
         print (f"Product Name: {product_details['Name']}")
         print (f"ID          : {product_id}")
         print (f"Price       : ${product_details['Price']:.2f}")
-        print (f"Quantity    : {product_details['Stock']}\n")
+        print (f"Stock       : {product_details['Stock']}\n")
         print ("---------------------------------------------\n")
 
 ##############################################################################
@@ -92,7 +93,7 @@ def make_sale():
         try:
             quantity = int(input(f"Enter the quantity sold (in stock: {product_catalog[id_of_sale]['Stock']}): "))
             if quantity < 1:
-                print (f"The quantity must be at least 1.")
+                print ("The quantity must be at least 1.")
                 continue
             if quantity > product_catalog[id_of_sale]['Stock']:
                 print (f"You've elected to sell more items ({quantity}) than are in stock ({product_catalog[id_of_sale]['Stock']}). Please try again.")
@@ -100,7 +101,7 @@ def make_sale():
             print (f"\nYou sold {quantity} of {id_of_sale} ({product_catalog[id_of_sale]['Name']})")
             break
         except ValueError:
-            print (f"The quantity must be an integer between 1 and the number of units in stock")
+            print ("The quantity must be an integer between 1 and the number of units in stock")
 
     sale = {
         'Sale ID': f'S{len(sales_history) + 1}',
@@ -131,7 +132,7 @@ def view_sales_history():
             print(f"Sale: {sale['Sale ID']}, Product: {sale['Product Name']}, Quantity: {sale['Quantity']}, Total: ${sale['Total Sale Amount']:.2f}, Date: {sale['Date and Time']}")
 
 ##############################################################################
-# Desc: This function display the KPIs such as revenue, best-selling products
+# Desc: This function displays the KPIs such as revenue, best-selling products
 #       and the product with the highest revenue
 # Parameters: None
 # Returns: None
@@ -193,7 +194,7 @@ def update_product_attribute(id_of_update, dictionary_key):
 
         if dictionary_key == 'Price':
             try:
-                updated_value = float(updated_value)
+                updated_value = round(float(updated_value), 2)
             except ValueError:
                 print(f"Invalid Type for {dictionary_key}. Please try again.")
                 continue
@@ -201,7 +202,7 @@ def update_product_attribute(id_of_update, dictionary_key):
                 print(f"Invalid Type for {dictionary_key}. Please try again.")
                 continue
             if updated_value < 0:
-                print(f"Price cannot be negative. Please try again.")
+                print("Price cannot be negative. Please try again.")
                 continue
         elif dictionary_key == 'Stock':
             try:
@@ -210,11 +211,11 @@ def update_product_attribute(id_of_update, dictionary_key):
                 print(f"Invalid Type for {dictionary_key}. Please try again.")
                 continue
             if updated_value < 0:
-                print(f"Stock cannot be negative. Please try again.")
+                print("Stock cannot be negative. Please try again.")
                 continue
         elif dictionary_key == 'Name':
             if updated_value.strip() == '':
-                print(f"Name cannot be blank. Please try again.")
+                print("Name cannot be blank. Please try again.")
                 continue
 
         break
@@ -237,7 +238,7 @@ def update_product_details():
             print (f"\nYou selected id: {id_of_update}, product: {product_catalog[id_of_update]['Name']}")
             break
         except KeyError:
-            print (f"Invalid id '{id_of_update}', please enter one of the product ids listed above.")
+            print (f"Invalid id '{id_of_update}', please enter a valid product id.")
 
     while True:
         print ("What would you like to update, Name, Price, or Stock?")

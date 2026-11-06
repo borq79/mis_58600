@@ -4,18 +4,20 @@
 #
 # Run from this folder (standard library only, no pip install needed):
 #
-#   python3 test_group10BrockKumarAssignment2.py -k Regression    # refactor net
-#   python3 test_group10BrockKumarAssignment2.py -k Todo          # work remaining
-#   python3 test_group10BrockKumarAssignment2.py                  # everything
-#   python3 test_group10BrockKumarAssignment2.py -v -k TodoKpis   # one group
+#   python3 test_group10BrockKumarAssignment2.py -k Regression      # refactor net
+#   python3 test_group10BrockKumarAssignment2.py -k Todo            # work remaining
+#   python3 test_group10BrockKumarAssignment2.py                    # everything
+#   python3 test_group10BrockKumarAssignment2.py -v -k TodoKnownBugs   # one group
 #
 # How the tests are organized:
 #
-#   Regression*  Behavior that works today. These must stay green. Run them
-#                after every refactor.
-#   Todo*        Lab 2 requirements not built yet, and known bugs. These start
-#                red and are the to-do list. Once they pass, run the whole file
-#                after each refactor.
+#   Regression*        Behavior that works today. These must stay green. Run
+#                      them after every refactor.
+#   TodoKnownBugs      Bugs in the program. Red until the program is fixed.
+#
+#   Every Todo test that is red is red because of the program, not the test.
+#   The summary at the end of a run lists them. A red Regression test means a
+#   change broke something that used to work.
 #
 # How the tests work:
 #
@@ -162,6 +164,15 @@ def sale_field(sale, field):
         f"Sale has no {field!r} field. Keys found: {list(sale)}. "
         f"Add yours to SALE_FIELD_NAMES if it is just spelled differently."
     )
+
+
+def assert_absent(text, pattern, reason):
+    """Fail if pattern is in text, showing only the lines that matched."""
+    hits = [line.strip() for line in text.splitlines()
+            if re.search(pattern, line, re.I)]
+    if hits:
+        shown = "\n  ".join(hits[:5])
+        raise AssertionError(f"{reason}\n  {shown}")
 
 
 class ProgramTestCase(unittest.TestCase):
@@ -439,9 +450,9 @@ class RegressionEmptySalesScreens(ProgramTestCase):
 
 
 ###############################################################################
-# Todo tests: Lab 2 requirements still to build
+# Regression tests: Lab 2 requirements that are built
 ###############################################################################
-class TodoSaleRecording(ProgramTestCase):
+class RegressionSaleRecording(ProgramTestCase):
     """Lab: Make a Sale updates stock and records a sale dictionary."""
 
     def test_sale_reduces_stock(self):
@@ -485,6 +496,7 @@ class TodoSaleRecording(ProgramTestCase):
         stamp = sale_field(self.history[0], "datetime")
         self.assertTrue(stamp)
         self.assertIn(str(datetime.now().year), str(stamp))
+        self.assertRegex(str(stamp), r"\d{1,2}:\d{2}")  # a time, not just a date
 
     def test_sale_ids_are_unique(self):
         for _ in range(5):
@@ -511,24 +523,21 @@ class TodoSaleRecording(ProgramTestCase):
         self.assertAlmostEqual(sale_field(self.history[0], "total"), 21.98,
                                places=2)
 
-    def test_sold_out_product_does_not_trap_the_user(self):
-        # Today nothing can satisfy the quantity prompt at zero stock, so the
-        # only way out of the screen is to quit the program. Either refusing at
-        # the id prompt or returning to the menu passes this test.
-        self.catalog["P7"]["Stock"] = 0
+    def test_total_has_no_floating_point_noise(self):
+        # 1.1 * 3 is 3.3000000000000003 before rounding.
+        self.update("P1", "Price", "1.10")
+        self.sell("P1", 3)
+        self.assertEqual(sale_field(self.history[0], "total"), 3.3)
 
-        def answer(prompt, prompt_number):
-            if prompt_number == 1:
-                return "P7"
-            return "P1" if re.search(r"\bid\b", prompt, re.I) else "1"
-
-        drive(self.program.make_sale, answer)
+    def test_restocked_product_can_be_sold_again(self):
+        self.sell("P7", 1)
+        self.update("P7", "Stock", "4")
+        self.sell("P7", 4)
         self.assertEqual(self.catalog["P7"]["Stock"], 0)
-        sold = [sale_field(sale, "product_id") for sale in self.history]
-        self.assertNotIn("P7", sold)
+        self.assertEqual(len(self.history), 2)
 
 
-class TodoSalesHistory(ProgramTestCase):
+class RegressionSalesHistory(ProgramTestCase):
     """Lab: View Sales History shows id, date/time, name, quantity and total."""
 
     def test_shows_every_required_detail(self):
@@ -563,9 +572,19 @@ class TodoSalesHistory(ProgramTestCase):
         self.assertIn("10.00",
                       drive(self.program.view_sales_history, []).output)
 
+    def test_history_keeps_the_name_used_at_the_time_of_the_sale(self):
+        self.sell("P1", 1)
+        self.update("P1", "Name", "Renamed Later")
+        self.assertIn("Product 1",
+                      drive(self.program.view_sales_history, []).output)
 
-class TodoKpis(ProgramTestCase):
-    """Lab: total revenue, best-selling product, highest-revenue product."""
+    def test_says_so_when_there_are_no_sales(self):
+        self.assertIn("No sales",
+                      drive(self.program.view_sales_history, []).output)
+
+
+class KpiHelpers:
+    """Shared by the working KPI tests and the KPI bug tests."""
 
     def product_after_label(self, output, label_pattern):
         """Return the first product mentioned after a label, like 'P3' """
@@ -585,6 +604,17 @@ class TodoKpis(ProgramTestCase):
 
     def kpis(self):
         return drive(self.program.display_kpis, []).output
+
+    def kpi_line(self, output, label_pattern):
+        """Return the printed line for a KPI, for checks by amount."""
+        for line in output.splitlines():
+            if re.search(label_pattern, line, re.I):
+                return line
+        self.fail(f"No {label_pattern!r} line in:\n{output}")
+
+
+class RegressionKpis(KpiHelpers, ProgramTestCase):
+    """Lab: total revenue, best-selling product, highest-revenue product."""
 
     def test_total_revenue_adds_up_every_sale(self):
         self.sell("P3", 10)  # 19.90
@@ -628,11 +658,27 @@ class TodoKpis(ProgramTestCase):
         self.assertEqual(len(final["sales_history"]), 2)
         self.assertIn("120.89", session.output)
 
+    def test_with_no_sales_revenue_is_zero_and_no_product_is_named(self):
+        output = self.kpis()
+        self.assertIn("$0.00", output)
+        self.assertNotRegex(output, r"Product \d")
+
+    def test_a_single_sale_is_both_best_seller_and_top_earner(self):
+        self.sell("P2", 1)
+        output = self.kpis()
+        self.assertEqual(self.best_seller(output), "P2")
+        self.assertEqual(self.top_earner(output), "P2")
+
+    def test_a_tie_still_reports_one_of_the_tied_products(self):
+        self.sell("P1", 2)
+        self.sell("P2", 2)
+        self.assertIn(self.best_seller(self.kpis()), ("P1", "P2"))
+
 
 ###############################################################################
-# Todo tests: known bugs in the code that exists today
+# Regression tests: bugs that have been fixed and must stay fixed
 ###############################################################################
-class TodoKnownBugs(ProgramTestCase):
+class RegressionFixedBugs(ProgramTestCase):
 
     def assert_rejected(self, key, bad_value, good_value):
         """A bad value must be refused, then a good one accepted."""
@@ -665,9 +711,13 @@ class TodoKnownBugs(ProgramTestCase):
         self.update("P1", "Price", "5.5")
         self.assertIn("$5.50", drive(self.program.view_catalog, []).output)
 
-    def test_zero_quantity_message_is_not_about_overselling(self):
-        session = drive(self.program.make_sale, ["P1", "0", "1"])
-        self.assertNotIn("more items (0)", session.output)
+    def test_low_quantity_message_is_not_about_overselling(self):
+        for bad_quantity in ("0", "-1"):
+            with self.subTest(bad_quantity=bad_quantity):
+                session = drive(self.program.make_sale,
+                                ["P1", bad_quantity, "1"])
+                assert_absent(session.output, r"more items",
+                              "Too few items is reported as too many:")
 
     def test_sale_id_prompt_only_asks_for_what_it_reads(self):
         prompt = self.sell("P1", 1).prompts[0].lower()
@@ -677,13 +727,87 @@ class TodoKnownBugs(ProgramTestCase):
         session = drive(self.program.update_product_details, ["P1", "4"])
         self.assertNotIn("sale", session.prompts[0].lower())
 
-    def test_text_shown_to_the_user_has_no_typos(self):
+    def error_text(self):
+        """Everything the user sees on the sale and update error paths."""
         sale = drive(self.program.make_sale, ["P99", "P1", "abc", "999", "1"])
         update = drive(self.program.update_product_details, ["P99", "P1", "4"])
-        output = sale.output + update.output
-        self.assertNotIn("quanity", output.lower())
-        self.assertNotIn("''", output)
-        self.assertNotIn("that are in stock", output)
+        return sale.output + update.output
+
+    def test_quantity_is_spelled_correctly_on_screen(self):
+        assert_absent(self.error_text(), r"quanity", "Misspelled word:")
+
+    def test_invalid_id_message_has_no_stray_quote(self):
+        assert_absent(self.error_text(), r"''", "Extra quote mark:")
+
+    def test_oversell_message_says_than_not_that(self):
+        assert_absent(self.error_text(), r"that are in stock", "Wrong word:")
+
+    def test_sold_out_product_does_not_trap_the_user(self):
+        # Nothing can satisfy the quantity prompt at zero stock, so the only way
+        # out of the screen is to quit the program. Either refusing at the id
+        # prompt or returning to the menu passes this test.
+        self.catalog["P7"]["Stock"] = 0
+
+        def answer(prompt, prompt_number):
+            if prompt_number == 1:
+                return "P7"
+            return "P1" if re.search(r"\bid\b", prompt, re.I) else "1"
+
+        drive(self.program.make_sale, answer)
+        self.assertEqual(self.catalog["P7"]["Stock"], 0)
+        sold = [sale_field(sale, "product_id") for sale in self.history]
+        self.assertNotIn("P7", sold)
+
+
+###############################################################################
+# Todo tests: bugs in the program. Each one is red because of the program.
+###############################################################################
+class TodoKnownBugs(KpiHelpers, ProgramTestCase):
+
+    def sell_rename_sell(self):
+        """Sell 12 of P1 under two names, and 10 of P3 under one."""
+        self.sell("P1", 6)
+        self.update("P1", "Name", "Renamed Item")
+        self.sell("P1", 6)
+        self.sell("P3", 10)
+
+    # display_kpis() groups sales by name, and a name can change. Grouping by
+    # 'Product ID' passes these two tests.
+    def test_best_seller_counts_sales_from_before_a_rename(self):
+        self.sell_rename_sell()
+        line = self.kpi_line(self.kpis(), r"best")
+        self.assertIn("12", line)
+        self.assertNotIn("Product 3", line)
+
+    def test_top_earner_counts_sales_from_before_a_rename(self):
+        self.sell_rename_sell()
+        line = self.kpi_line(self.kpis(), r"highest")
+        self.assertIn("131.88", line)  # 12 * 10.99
+
+    def test_products_sharing_a_name_are_not_counted_as_one(self):
+        # Either refusing the duplicate name or grouping by 'Product ID' passes.
+        self.update("P2", "Name", "Product 1", "Unique Name", allow_unused=True)
+        self.sell("P1", 6)
+        self.sell("P2", 6)
+        self.sell("P3", 10)
+        self.assertIn("10", self.kpi_line(self.kpis(), r"best"))
+
+    def test_price_is_kept_to_the_cent(self):
+        # 1.994 displays as $1.99, but 100 of them are charged as $199.40.
+        # Either rounding the price or refusing it passes.
+        self.update("P1", "Price", "1.994", "1.99", allow_unused=True)
+        self.sell("P1", 100)
+        self.assertAlmostEqual(sale_field(self.history[0], "total"), 199.00,
+                               places=2)
+
+    def test_update_screen_shows_the_ids_its_error_refers_to(self):
+        # The error says "listed above", so something has to be listed above.
+        # Either showing the catalog first or rewording the error passes.
+        session = drive(self.program.update_product_details,
+                        ["P99", "P1", "4"])
+        if "listed above" in session.output:
+            first_prompt = session.output.index(session.prompts[0])
+            self.assertIn("Product 1", session.output[:first_prompt])
 
 
 def good_value_as(key, text):
@@ -691,20 +815,52 @@ def good_value_as(key, text):
 
 
 ###############################################################################
-# Todo tests: checks before turning in the assignment
+# Regression tests: checks before turning in the assignment
 ###############################################################################
-class TodoSubmissionChecks(unittest.TestCase):
+class RegressionSubmissionChecks(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
         cls.source = PROGRAM_PATH.read_text(encoding="utf-8")
 
     def test_no_placeholder_comments_remain(self):
-        self.assertNotRegex(self.source, r"(?i)your code")
+        assert_absent(self.source, r"your code", "Placeholder comment:")
 
     def test_collaboration_task_lists_are_filled_in(self):
-        self.assertNotRegex(self.source, r"# 1\.[ \t]*\n")
+        assert_absent(self.source, r"# 1\.[ \t]*$", "Empty task list entry:")
+
+
+###############################################################################
+# Summary at the end of a run
+###############################################################################
+class SummaryResult(unittest.TextTestResult):
+    """After the usual report, list what is red and who it points at."""
+
+    def printErrors(self):
+        super().printErrors()
+        names = {}
+        for test, _ in self.failures + self.errors:
+            test = getattr(test, "test_case", test)  # unwrap a subTest
+            group = type(test).__name__
+            names.setdefault(group, set()).add(test._testMethodName)
+        self.stream.writeln()
+        self.stream.writeln("=" * 70)
+        if not names:
+            self.stream.writeln("SUMMARY: nothing is red.")
+        for group in sorted(names):
+            if group.startswith("Regression"):
+                heading = "BROKEN BY A RECENT CHANGE"
+            else:
+                heading = "PROGRAM NEEDS FIXING"
+            self.stream.writeln(f"{heading}: {group}")
+            for name in sorted(names[group]):
+                self.stream.writeln(f"  - {name}")
+        self.stream.writeln("=" * 70)
+
+
+class SummaryRunner(unittest.TextTestRunner):
+    resultclass = SummaryResult
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(testRunner=SummaryRunner)
