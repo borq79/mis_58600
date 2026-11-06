@@ -10,7 +10,7 @@
 ###############################################################################
 # Notes on collaboration
 #
-# Tasks done by Sachin:
+# Tasks done by Sachin: ()
 # 1. Implemented view_sales_history function
 # 2. Implemented display_kpis function
 # 3. Implemented make_sale logic and sale recording
@@ -25,8 +25,9 @@
 # ensuring we did not break anything during our sessions, we had Claude create
 # a series of unit tests to validate the program. The unit tests allowed us to
 # refactor the code safely knowing we didn't break anything. They are available
-# upon request. AI was not used in the creation of the code within this file,
-# only the unit tests.
+# upon request. 
+# Ryan: AI was not used in the creation of the code within this file,only the unit tests.
+# Sachin Kumar:  AI tool used : Auto suggestion/code complete built-in within VSS Code IDE.
 #
 ###############################################################################
 # Initialize the product catalog
