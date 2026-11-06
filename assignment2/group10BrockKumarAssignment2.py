@@ -11,15 +11,19 @@
 # Notes on collaboration
 #
 # Tasks done by Sachin:
-# 1. 
+# 1. Implemented view_sales_history function
+# 2. Implemented display_kpis function
+# 3. Implemented make_sale logic and sale recording
 #
 # Tasks done by Ryan:
-# 1. 
+# 1. Implemented view_catalog function
+# 2. Implemented update_product_attribute function
+# 3. Implemented update_product_details function
 #
 # This was a 50/50 effort. We both wrote code on our own, merged the code, and
 # then worked together to review bugs and clean up the code. To assist in
 # ensuring we did not break anything during our sessions, we had Claude create
-# a series of unit tests to validate the program. The unit tests allowed us to 
+# a series of unit tests to validate the program. The unit tests allowed us to
 # refactor the code safely knowing we didn't break anything. They are available
 # upon request. AI was not used in the creation of the code within this file,
 # only the unit tests.
@@ -27,6 +31,7 @@
 ###############################################################################
 # Initialize the product catalog
 
+import math
 from datetime import datetime
 
 product_catalog = {
@@ -57,7 +62,7 @@ def view_catalog():
     for product_id, product_details in product_catalog.items():
         print (f"Product Name: {product_details['Name']}")
         print (f"ID          : {product_id}")
-        print (f"Price       : ${product_details['Price']}")
+        print (f"Price       : ${product_details['Price']:.2f}")
         print (f"Quantity    : {product_details['Stock']}\n")
         print ("---------------------------------------------\n")
 
@@ -71,41 +76,45 @@ def make_sale():
     view_catalog()
 
     while True:
-        # get user input on which product to sell and how much quantity.
-        id_of_sale = input("Enter the product id of the sale and the quanity: ")
+        # get user input on which product to sell
+        id_of_sale = input("Enter the product id of the sale: ")
         if not id_of_sale in product_catalog:
-            print (f"Invalid id '{id_of_sale}'', please enter one of the product ids listed above.")
+            print (f"Invalid id '{id_of_sale}', please enter one of the product ids listed above.")
             continue
         break
-            
+
+    if product_catalog[id_of_sale]['Stock'] == 0:
+        print(f"Sorry, {product_catalog[id_of_sale]['Name']} is out of stock.")
+        return
 
     while True:
         try:
-            quanity = int(input(f"Enter the quanity sold (in stock: {product_catalog[id_of_sale]['Stock']}): "))
-            if quanity < 1 or quanity > product_catalog[id_of_sale]['Stock']:
-                print (f"You've elected to sell more items ({quanity}) that are in stock ({product_catalog[id_of_sale]['Stock']}). Please try again.")
-                continue  
-            print (f"\nYou sold {quanity} of {id_of_sale} ({product_catalog[id_of_sale]['Name']})")
+            quantity = int(input(f"Enter the quantity sold (in stock: {product_catalog[id_of_sale]['Stock']}): "))
+            if quantity < 1:
+                print (f"The quantity must be at least 1.")
+                continue
+            if quantity > product_catalog[id_of_sale]['Stock']:
+                print (f"You've elected to sell more items ({quantity}) than are in stock ({product_catalog[id_of_sale]['Stock']}). Please try again.")
+                continue
+            print (f"\nYou sold {quantity} of {id_of_sale} ({product_catalog[id_of_sale]['Name']})")
             break
         except ValueError:
-            print (f"The quanity must be an integer between 1 and the number of units in stock")
+            print (f"The quantity must be an integer between 1 and the number of units in stock")
 
     sale = {
         'Sale ID': f'S{len(sales_history) + 1}',
         'Date and Time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'Product ID': id_of_sale,
         'Product Name': product_catalog[id_of_sale]['Name'],
-        'Quantity': quanity,
-        'Total Sale Amount': round(product_catalog[id_of_sale]['Price'] * quanity, 2)
+        'Quantity': quantity,
+        'Total Sale Amount': round(product_catalog[id_of_sale]['Price'] * quantity, 2)
     }
-    product_catalog[id_of_sale]['Stock'] -= quanity
+    product_catalog[id_of_sale]['Stock'] -= quantity
     sales_history.append(sale)
     print(f"Sale {sale['Sale ID']} completed. Total: ${sale['Total Sale Amount']:.2f}")
     print(f"Remaining stock: {product_catalog[id_of_sale]['Stock']}")
     print ("---------------------------------------------\n")
 
-    # Sachin: your code to make the sale 
-    
 
 ##############################################################################
 # Desc: This function will display the sales history
@@ -113,7 +122,6 @@ def make_sale():
 # Returns: None
 ##############################################################################
 def view_sales_history():
-    # Sachin: your code to view the sales history
     print("\nSales History:")
     if not sales_history:
         print("No sales history available.")
@@ -128,14 +136,13 @@ def view_sales_history():
 # Returns: None
 ##############################################################################
 def display_kpis():
-    # Sachin: your code to view kpis
     total_revenue = sum(sale['Total Sale Amount'] for sale in sales_history)
     print(f"\nTotal Sales Revenue: ${total_revenue:.2f}")
-    
+
     if not sales_history:
         print("No sales history available to determine best-selling products.")
         return
-    
+
     # Calculate best-selling products
     product_sales = {}
     for sale in sales_history:
@@ -146,7 +153,7 @@ def display_kpis():
         else:
             product_sales[product_name] = quantity
 
-    best_selling_product = max(product_sales, key=product_sales.get)
+    best_selling_product = sorted(product_sales, key=product_sales.get, reverse=True)[0]
     print(f"Best-Selling Product: {best_selling_product} with {product_sales[best_selling_product]} units sold.")
 
     # Find product with highest revenue
@@ -159,7 +166,8 @@ def display_kpis():
         else:
             product_revenue[product_name] = total_sale_amount
 
-    highest_revenue_product = max(product_revenue, key=product_revenue.get)
+    highest_revenue_product = sorted(product_revenue, key=product_revenue.get, reverse=True)[0]
+
     print(f"Product with Highest Revenue: {highest_revenue_product} with ${product_revenue[highest_revenue_product]:.2f} in revenue.")
 
     return
@@ -179,22 +187,35 @@ def update_product_attribute(id_of_update, dictionary_key):
         print (f"Invalid Product Catalog Attribute Name {dictionary_key}")
         return
 
-
     while True:
         updated_value = input(f"Enter the updated {dictionary_key}: ")
 
-        try:
-            if dictionary_key == 'Price':
+        if dictionary_key == 'Price':
+            try:
                 updated_value = float(updated_value)
-            elif dictionary_key == 'Stock':
+            except ValueError:
+                print(f"Invalid Type for {dictionary_key}. Please try again.")
+                continue
+            if math.isnan(updated_value) or math.isinf(updated_value):
+                print(f"Invalid Type for {dictionary_key}. Please try again.")
+                continue
+            if updated_value < 0:
+                print(f"Price cannot be negative. Please try again.")
+                continue
+        elif dictionary_key == 'Stock':
+            try:
                 updated_value = int(updated_value)
-        except ValueError:
-            print(f"Invalid Type for {dictionary_key}. Please try again.")
-            continue
+            except ValueError:
+                print(f"Invalid Type for {dictionary_key}. Please try again.")
+                continue
+            if updated_value < 0:
+                print(f"Stock cannot be negative. Please try again.")
+                continue
+        elif dictionary_key == 'Name':
+            if updated_value.strip() == '':
+                print(f"Name cannot be blank. Please try again.")
+                continue
 
-        if type(updated_value) != type(product_catalog[id_of_update][dictionary_key]):
-            print (f"Invalid Type for field {dictionary_key}. Please try again.")
-            continue
         break
 
     try:
@@ -209,13 +230,13 @@ def update_product_attribute(id_of_update, dictionary_key):
 ##############################################################################
 def update_product_details():
     while True:
-        try: 
+        try:
             # get user input on which product to update
-            id_of_update = input("Enter the product id of the sale: ")
+            id_of_update = input("Enter the product id to update: ")
             print (f"\nYou selected id: {id_of_update}, product: {product_catalog[id_of_update]['Name']}")
             break
         except KeyError:
-            print (f"Invalid id '{id_of_update}'', please enter one of the product ids listed above.")
+            print (f"Invalid id '{id_of_update}', please enter one of the product ids listed above.")
 
     while True:
         print ("What would you like to update, Name, Price, or Stock?")
