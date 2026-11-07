@@ -30,8 +30,8 @@ from datetime import datetime
 
 # Ryan: AI was not used in the creation of the code within this file,
 #       only the unit tests.
-# Sachin Kumar:  AI tool used : Auto suggestion/code complete 
-#                built-in within VS Code IDE.
+# Sachin: AI tool used : Auto suggestion/code complete 
+#                built-in within VS Code IDE, no external AI tool was used..
 #
 ###############################################################################
 
@@ -66,8 +66,7 @@ def view_catalog():
         print (f"ID          : {product_id}")
         print (f"Price       : ${product_details['Price']:.2f}")
         print (f"Stock       : {product_details['Stock']}\n")
-        print ("---------------------------------------------\n")
-
+        
 ##############################################################################
 # Desc: This function will execute the sale
 # Parameters: None
@@ -115,7 +114,6 @@ def make_sale():
     sales_history.append(sale)
     print(f"Sale {sale['Sale ID']} completed. Total: ${sale['Total Sale Amount']:.2f}")
     print(f"Remaining stock: {product_catalog[id_of_sale]['Stock']}")
-    print ("---------------------------------------------\n")
 
 
 ##############################################################################
@@ -145,32 +143,34 @@ def display_kpis():
         print("No sales history available to determine best-selling products.")
         return
 
-    # Calculate best-selling products
+    # Calculate best-selling products (grouped by Product ID to handle renames)
     product_sales = {}
     for sale in sales_history:
-        product_name = sale['Product Name']
+        product_id = sale['Product ID']
         quantity = sale['Quantity']
-        if product_name in product_sales:
-            product_sales[product_name] += quantity
+        if product_id in product_sales:
+            product_sales[product_id] += quantity
         else:
-            product_sales[product_name] = quantity
+            product_sales[product_id] = quantity
 
-    best_selling_product = sorted(product_sales, key=product_sales.get, reverse=True)[0]
-    print(f"Best-Selling Product: {best_selling_product} with {product_sales[best_selling_product]} units sold.")
+    best_selling_id = sorted(product_sales, key=product_sales.get, reverse=True)[0]
+    best_selling_name = product_catalog[best_selling_id]['Name']
+    print(f"Best-Selling Product: {best_selling_name} with {product_sales[best_selling_id]} units sold.")
 
-    # Find product with highest revenue
+    # Find product with highest revenue (grouped by Product ID to handle renames)
     product_revenue = {}
     for sale in sales_history:
-        product_name = sale['Product Name']
+        product_id = sale['Product ID']
         total_sale_amount = sale['Total Sale Amount']
-        if product_name in product_revenue:
-            product_revenue[product_name] += total_sale_amount
+        if product_id in product_revenue:
+            product_revenue[product_id] += total_sale_amount
         else:
-            product_revenue[product_name] = total_sale_amount
+            product_revenue[product_id] = total_sale_amount
 
-    highest_revenue_product = sorted(product_revenue, key=product_revenue.get, reverse=True)[0]
+    highest_revenue_id = sorted(product_revenue, key=product_revenue.get, reverse=True)[0]
+    highest_revenue_name = product_catalog[highest_revenue_id]['Name']
 
-    print(f"Product with Highest Revenue: {highest_revenue_product} with ${product_revenue[highest_revenue_product]:.2f} in revenue.")
+    print(f"Product with Highest Revenue: {highest_revenue_name} with ${product_revenue[highest_revenue_id]:.2f} in revenue.")
 
     return
 
